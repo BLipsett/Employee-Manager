@@ -25,3 +25,6 @@ CREATE TABLE department (
   deartment_name VARCHAR (30) NOT NULL,
   PRIMARY KEY (id)
 );
+
+
+INSERT INTO employee (first_name, last_name, roles_id, manager_id) VALUES ("brian", "lipsett", 7, 3);

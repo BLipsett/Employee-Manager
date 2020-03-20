@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/BLipsett/Employee-Manager#readme",
   "dependencies": {
-    "inquirer": "^7.1.0"
+    "inquirer": "^7.1.0",
+    "node-mysql": "^0.4.2"
   }
 }
