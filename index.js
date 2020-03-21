@@ -18,7 +18,8 @@ let connection = mysql.createConnection({
 
 connection.connect(function (err) {
   if (err) throw err;
-  listEmps();
+  listHouse();
+  
 });
 
 function listEmps() {
@@ -27,14 +28,25 @@ function listEmps() {
       throw err;
     }
     console.log(data);
-    // Test it.
-    // console.log('The solution is: ', data);
+    console.log("first")
+  });
+}
 
-    // Test it.
-    // res.send(data);
+function listRoles() {
+  connection.query("SELECT * FROM roles;", function (err, data) {
+    if (err) {
+      throw err;
+    }
+    console.log(data);
+  });
+}
 
-    //res.render("index", { wishes: data });
-    runSearch();
+function listHouse() {
+  connection.query("SELECT first_name, last_name, salary, title FROM employee JOIN roles ON employee.id = roles.id;", function (err, data) {
+    if (err) {
+      throw err;
+    }
+    console.table(data);
   });
 }
 
@@ -50,7 +62,7 @@ function runSearch() {
         type: "rawlist",
         message: "What would you like to do?",
         choices: [
-          "Find songs by artist",
+          "View all employees",
           "Find all artists who appear more than once",
           "Find data within a specific range",
           "Search for a specific song",
@@ -66,6 +78,7 @@ function runSearch() {
 
     });
 }
+
 
 // function artistSearch() {
 //   connection.query("INSERT INTO wishes (wish) VALUES (?)", [req.body.wish], function (err, result) {
