@@ -41,6 +41,7 @@ function runSearch() {
           "View employees by manager",
           "View employees by department",
           "Add employee",
+          "Add department",
           "Remove employee",
           "Update employee role",
           "Update employee manager",
@@ -55,15 +56,19 @@ function runSearch() {
           break;
 
         case "View employees by manager":
-          employeeManager();
+          listEmps();
           break;
 
         case "View employees by department":
-          employeeDepartment();
+          getRoles();
           break;
 
         case "Add employee":
           employeeAdd();
+          break;
+
+        case "Add department":
+          departmentAdd();
           break;
 
         case "Find artists with a top song and top album in the same year":
@@ -145,7 +150,7 @@ function listEmps() {
       throw err;
     }
     var resultArray = Object.values(JSON.parse(JSON.stringify(data)));
-
+    console.log(resultArray);
     for (key in resultArray) {
       if (resultArray.hasOwnProperty(key)) {
         var value = resultArray[key];
@@ -157,6 +162,19 @@ function listEmps() {
     }
     runSearch();
   });
+}
+
+let emptList = []
+
+function getRoles() {
+  connection.query("SELECT roles_id, title FROM roles;", function (err, data) {
+    if (err) {
+      throw err;
+    }
+    emptList = Object.values(JSON.parse(JSON.stringify(data)));
+    console.log(emptList);
+
+  })
 }
 
 function employeeAdd() {
@@ -175,26 +193,24 @@ function employeeAdd() {
         message: "Last name?"
       },
       {
-        name: "salary",
-        type: "input",
-        message: "Salary?",
-        // validate: (function (value) {
-
-        // })
-      },
-      {
-        name: "title",
-        type: "input",
-        message: "Job title?"
-      },
-      {
-        name: "department",
-        type: "input",
-        message: "Department?"
+        name: "role",
+        type: "list",
+        message: "What is the title",
+        choices: ["Driver"
+        ],
       }
     ]).then(answers => {
-      console.log(answers);
-      createEmployee(answers)
+      connection.query("SELECT roles_id FROM roles WHERE title = ?;", [`${answers.role}`], function (err, data) {
+        if (err) {
+          throw err;
+        }
+        console.log(answers);
+        console.log(data);
+
+        roleId = Object.values(JSON.parse(JSON.stringify(data)))[0].roles_id;
+        createEmployee(answers, roleId);
+
+      })
 
     })
     .catch(error => {
@@ -207,36 +223,63 @@ function employeeAdd() {
 
 }
 
-function createEmployee(answers) {
+function createEmployee(answers, role_id) {
   console.log("Inserting a new employee...\n");
   let query = connection.query(
-      "INSERT INTO employee SET ?",
-      {
-          first_name: `${answers.first}`,
-          last_name: `${answers.last}`,
-          // salary: `${answers.salary}`,
-          // title: `${answers.title}`,
-          // deartment: `${answers.department}`
-      },
-      function (err, res) {
-          if (err) throw err;
-          console.log(res.affectedRows + " product inserted!\n");
-          // Call updateProduct AFTER the INSERT completes
+    "INSERT INTO employee SET ?",
+    {
+      first_name: `${answers.first}`,
+      last_name: `${answers.last}`,
+      roles_id: parseInt(role_id),
 
-      }
+    },
+    function (err, res) {
+      if (err) throw err;
+      console.log(res.affectedRows + " employee inserted!\n");
+      // Call updateProduct AFTER the INSERT completes
+
+    }
   );
 
   // logs the actual query being run
   console.log(query.sql);
 }
+function departmentAdd() {
+  inquirer
+    .prompt([
+      {
+        name: "department",
+        type: "input",
+        message: "What is the department called?"
+      },
 
+    ]).then(function (answer) {
+      createDepartment(answer);
+    })
+}
+
+function createDepartment(answer) {
+  connection.query("INSERT INTO department SET ?",
+    {
+      department_name: `${answer.department}`
+    },
+    function (err, res) {
+      if (err) throw err;
+      console.log(res.affectedRows + " department inserted!\n");
+      // Call updateProduct AFTER the INSERT completes
+
+    }
+
+  )
+}
 
 
 function listHouse() {
-  connection.query("SELECT first_name, last_name, salary, title FROM employee JOIN roles ON employee.id = roles.id;", function (err, data) {
+  connection.query("SELECT first_name, last_name, salary, title FROM employee JOIN roles ON employee.roles_id = roles.roles_id;", function (err, data) {
     if (err) {
       throw err;
     }
+    console.log(data)
     console.table(data);
     runSearch();
   });
