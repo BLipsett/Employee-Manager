@@ -45,7 +45,7 @@ function runSearch() {
           "Remove employee",
           "Update employee role",
           "Update employee manager",
-          "View all roles"
+          "View all departments"
 
         ]
       }
@@ -71,9 +71,12 @@ function runSearch() {
           departmentAdd();
           break;
 
-        case "Find artists with a top song and top album in the same year":
-          songAndAlbumSearch();
+        case "View all departments":
+          viewDepartments();
           break;
+
+
+
       }
     });
 }
@@ -126,22 +129,14 @@ function employeeDepartment() {
     });
 }
 
-function artistSearch() {
-  inquirer
-    .prompt({
-      name: "artist",
-      type: "input",
-      message: "What artist would you like to search for?"
-    })
-    .then(function (answer) {
-      var query = "SELECT position, song, year FROM top5000 WHERE ?";
-      connection.query(query, { artist: answer.artist }, function (err, res) {
-        for (var i = 0; i < res.length; i++) {
-          console.log("Position: " + res[i].position + " || Song: " + res[i].song + " || Year: " + res[i].year);
-        }
-        runSearch();
-      });
-    });
+function viewDepartments() {
+  connection.query("SELECT department_name FROM department;", function (err, data) {
+    if (err) {
+      throw err;
+    }
+    console.table(data);
+    runSearch();
+  });
 }
 
 function listEmps() {
@@ -210,8 +205,8 @@ function employeeAdd() {
         roleId = Object.values(JSON.parse(JSON.stringify(data)))[0].roles_id;
         createEmployee(answers, roleId);
 
+        runSearch();
       })
-
     })
     .catch(error => {
       if (error.isTtyError) {
