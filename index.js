@@ -18,14 +18,10 @@ let connection = mysql.createConnection({
 
 connection.connect(function (err) {
   if (err) throw err;
-  //listHouse();
+
   runSearch();
 
 });
-
-
-
-
 
 function runSearch() {
 
@@ -137,6 +133,7 @@ function viewDepartments() {
     console.table(data);
     runSearch();
   });
+  runSearch();
 }
 
 function listEmps() {
@@ -191,7 +188,7 @@ function employeeAdd() {
         name: "role",
         type: "list",
         message: "What is the title",
-        choices: ["Driver"
+        choices: ["Sales", "Customer Service", "Intern", "Manager",
         ],
       }
     ]).then(answers => {
@@ -250,6 +247,7 @@ function departmentAdd() {
 
     ]).then(function (answer) {
       createDepartment(answer);
+      runSearch();
     })
 }
 
@@ -260,8 +258,7 @@ function createDepartment(answer) {
     },
     function (err, res) {
       if (err) throw err;
-      console.log(res.affectedRows + " department inserted!\n");
-      // Call updateProduct AFTER the INSERT completes
+
 
     }
 
@@ -274,7 +271,6 @@ function listHouse() {
     if (err) {
       throw err;
     }
-    console.log(data)
     console.table(data);
     runSearch();
   });
